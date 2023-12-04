@@ -1,9 +1,8 @@
-// HomeScreen.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, StyleSheet, Button } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../../redux/actions/productActions';
-import ImagePicker from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
 
 const HomeScreen = () => {
@@ -21,38 +20,40 @@ const HomeScreen = () => {
     console.log('Received products:', products);
   }, [products]);
 
-  // Function to handle the button press
-  const handleTaskButtonPress = () => {
-    // Open image picker
-    ImagePicker.showImagePicker({}, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error:', response.error);
-      } else {
+  // Function to handle the button press using react-native-image-crop-picker
+  const handleTaskButtonPress = async () => {
+    try {
+      const image = await ImagePicker.openPicker({
+        width: 300,
+        height: 400,
+        cropping: true,
+      });
+
+      if (image) {
         // Upload the selected image
-        uploadImage(response.uri);
+        uploadImage(image.path);
       }
-    });
+    } catch (error) {
+      console.error('ImagePicker Error:', error);
+    }
   };
 
   // Function to upload the image to the API
-  const uploadImage = async (uri) => {
+  const uploadImage = async (path) => {
     try {
       const formData = new FormData();
       formData.append('file', {
-        uri,
-        type: 'image/jpeg', // Adjust the type based on the image type
+        uri: path,
+        type: 'image/jpeg',
         name: 'image.jpg',
       });
 
       const response = await axios.post(
-        'https://upload.imagekit.io/api/v1/files/upload',
+        'https://ik.imagekit.io/78dcqstv9/v1/files/upload',
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            // Add any other headers as needed
           },
         }
       );
@@ -79,7 +80,7 @@ const HomeScreen = () => {
 
       {/* FlatList to display products */}
       <FlatList
-        data={products.products.products} // Accessing the nested products array
+        data={products.products.products}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.productContainer}>
