@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import store from './redux/store';
 import LoginScreen from './src/screens/LoginScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import ImageUploadScreen from './src/screens/ImageUploadScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,6 +18,8 @@ const App = () => {
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="ImageUploadScreen" component={ImageUploadScreen} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </Provider>
